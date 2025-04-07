@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <title>Sign Up - TaskHive</title>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="flex items-center justify-center min-h-screen bg-gray-100">
@@ -21,12 +21,12 @@
       </h1> 
     </div>
     <div class="bg-white p-6 rounded-lg shadow-lg w-90">
-      <h2 class="text-2xl text-[#63191C] font-bold text-center mb-4">Sign IN!</h2>
+      <h2 class="text-2xl text-[#63191C] font-bold text-center mb-4">Sign Up</h2>
       <form>
         <div class="mb-4">
             <label class="block text-[#A17865]">Name</label>
-            <input type="name" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EAD7C8]" required />
-          </div>
+            <input type="text" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EAD7C8]" required />
+        </div>
         <div class="mb-4">
           <label class="block text-[#A17865]">Email</label>
           <input type="email" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EAD7C8]" required />
@@ -37,13 +37,17 @@
         </div>
         <div class="mb-4">
             <label class="block text-[#A17865]">Confirm Password</label>
-            <input type="Cpassword" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EAD7C8]" required />
-          </div>
+            <input type="password" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EAD7C8]" required />
+        </div>
         <div class="flex justify-center">
-        <button class="w-half bg-[#D2B6A1] text-white px-6 py-2 rounded-lg hover:bg-[#EAD7C8] transition align">Sign in</button>
+          <button class="w-half bg-[#D2B6A1] text-white px-6 py-2 rounded-lg hover:bg-[#EAD7C8] transition align">Sign Up</button>
         </div>
       </form>
     </div>
+
+    <!-- Clerk's SignUp Component will be mounted here -->
+    <div id="clerk-signup-container"></div>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

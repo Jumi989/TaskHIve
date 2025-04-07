@@ -20,26 +20,12 @@
         <span class="text-[#D2B6A1]">e</span>
       </h1>
     </div>
-    <div class="bg-white p-6 rounded-lg shadow-lg w-80">
-      <h2 class="text-2xl text-[#63191C] font-bold text-center mb-4">Login</h2>
-      <form>
-        <div class="mb-4">
-          <label class="block text-[#A17865]">Email</label>
-          <input type="email" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EAD7C8] text-[#63191C]" required />
-        </div>
-        <div class="mb-4">
-          <label class="block text-[#A17865]">Password</label>
-          <input type="password" class="text-[#63191C] w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EAD7C8]" required />
-        </div>
-        <div class="flex justify-center">
-        <button class="w-half bg-[#D2B6A1] text-white px-6 py-2 rounded-lg hover:bg-[#EAD7C8] transition align">Login</button>
-        </div>
-      </form>
-      <p class="mt-4 text-center text-gray-600">
-        Don't have an account? 
-        <a href="/signup.html" class="text-[#A17865] font-semibold shadow-lg hover:text-[#EAD7C8]">Sign up</a>
-      </p>
+
+    <!-- This div will be dynamically updated with SignIn or UserButton components -->
+    <div id="app">
+      <!-- The SignIn and UserButton components will be mounted here -->
     </div>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

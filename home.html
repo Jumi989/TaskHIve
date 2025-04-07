@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>TaskHive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* ... your existing styles ... */
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-5 relative">
 
-    <h1 class="text-3xl font-bold font-serif text-gray-800 mb-4">
+    <h1 class="absolute top-5 left-5 text-3xl font-bold font-serif text-gray-800 mb-4 ">
         <span class="text-[#63191C]">T</span>
         <span class="text-[#A17865]">a</span>
         <span class="text-[#EAD7C8]">s</span>
@@ -16,46 +20,23 @@
         <span class="text-[#A17865]">i</span>
         <span class="text-[#EAD7C8]">v</span>
         <span class="text-[#D2B6A1]">e</span>
-      </h1>
+    </h1>
 
-    <div id="app" class="flex items-center space-x-4 mb-4">
-        <h2 class="text-[#8D3E36] font-serif text-lg">Hello user!</h2>
+    <div id="div" class="flex items-center space-x-4 mb-4">
+        <h2 id="greeting" class="text-[#8D3E36] font-serif text-lg"></h2>
+        <div id="user-button"></div>
     </div>
 
-    <!-- Grid of Task Pads -->
-    <div id="taskPadsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <!-- Task Pads will be dynamically added here -->
+    <div id="scrollableTaskPads" class="max-h-[calc((4 * 100px) + 20px)] overflow-y-auto">
+        <div id="taskPadsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-[#63191C]">
+        </div>
     </div>
 
-    <!-- Floating Add Button -->
-    <button id="addTaskPad" class="fixed bottom-5 right-5 bg-[#63191C] text-white text-3xl w-16 h-16 flex items-center justify-center rounded-full shadow-lg hover:bg-[#8A2A2D]">
-      +
-  </button>
+    <button id="addTaskPad" class="fixed bottom-15 right-15 bg-[#63191C] text-white text-3xl w-16 h-16 flex items-center justify-center rounded-full shadow-lg hover:bg-[#8A2A2D]" disabled="">
+        +
+    </button>
 
-    <script>
-        document.getElementById("addTaskPad").addEventListener("click", function () {
-            const taskPadsContainer = document.getElementById("taskPadsContainer");
-
-            // Create a new task pad
-            const taskPad = document.createElement("div");
-            taskPad.classList.add("bg-white", "p-4", "rounded-lg", "shadow-md", "relative");
-
-            // Task pad content
-            taskPad.innerHTML = `
-                <input type="text" class="task-title text-lg font-semibold w-full bg-transparent focus:outline-none" placeholder="Task Title" />
-                <textarea class="task-description w-full bg-transparent mt-2 focus:outline-none text-sm" placeholder="Write something..."></textarea>
-                <p class="task-date text-gray-500 text-xs mt-2">${new Date().toDateString()}</p>
-                <button class="delete-pad absolute top-2 right-2 text-red-500 text-lg">&times;</button>
-            `;
-
-            // Append to grid
-            taskPadsContainer.appendChild(taskPad);
-
-            // Delete task pad
-            taskPad.querySelector(".delete-pad").addEventListener("click", function () {
-                taskPad.remove();
-            });
-        });
-    </script>
+    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/home.js"></script>
 </body>
 </html>
