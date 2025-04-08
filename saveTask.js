@@ -86,11 +86,12 @@ app.delete('/api/taskpads/:id', async (req, res) => {
 // 👉 Get all tasks for a user (modified to potentially filter by task_pad_id)
 app.get('/api/tasks/:userEmail', async (req, res) => {
     const { userEmail } = req.params;
-    const { taskPadId } = req.query; // Optional filter by task pad
+    const { taskPadId } = req.query; // Use taskPadId from the query params
 
     let query = 'SELECT * FROM tasks WHERE user_email = $1';
     const values = [userEmail];
 
+    // Filter by task_pad_id if provided
     if (taskPadId) {
         query += ' AND task_pad_id = $2';
         values.push(taskPadId);
@@ -105,6 +106,7 @@ app.get('/api/tasks/:userEmail', async (req, res) => {
     }
 });
 
+
 // 👉 Add new task
 // backend/server.js
 
@@ -112,38 +114,33 @@ app.get('/api/tasks/:userEmail', async (req, res) => {
 
 // 👉 Add new task
 app.post('/api/tasks', async (req, res) => {
-    const { userEmail, taskText, taskPadId } = req.body; // Expecting these from the frontend
-    const title = taskText; // Setting the title to be the same as the task text for now
+    const { userEmail, taskText, taskPadId } = req.body;
 
     if (!taskPadId) {
-        return res.status(400).json({ error: 'taskPadId is required to create a task' });
+        return res.status(400).json({ error: 'Task pad ID is required to create a task' });
     }
 
     try {
-        // 1. Get the current maximum task_item_order for the given task_pad_id
+        // Get the next task_item_order for the task_pad_id
         const orderResult = await client.query(
             'SELECT MAX(task_item_order) FROM tasks WHERE task_pad_id = $1',
             [taskPadId]
         );
-        const currentMaxOrder = orderResult.rows[0].max || 0;
+        const nextOrder = (orderResult.rows[0].max || 0) + 1;
 
-        // 2. Determine the next task_item_order
-        const nextOrder = currentMaxOrder + 1;
-
-        // 3. Insert the new task with all the required information
+        // Insert the task
         const result = await client.query(
-            'INSERT INTO tasks (user_email, title, task_text, task_pad_id, task_item_order) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [userEmail, title, taskText, taskPadId, nextOrder]
+            'INSERT INTO tasks (user_email, task_text, task_pad_id, task_item_order) VALUES ($1, $2, $3, $4) RETURNING *',
+            [userEmail, taskText, taskPadId, nextOrder]
         );
 
-        // 4. Send the newly created task data back to the frontend
         res.status(201).json(result.rows[0]);
-
     } catch (err) {
-        console.error("Error creating task:", err);
+        console.error('Error creating task:', err);
         res.status(500).json({ error: 'Error creating task' });
     }
 });
+
 
 // ... other routes ...
 
@@ -193,18 +190,23 @@ app.put('/api/tasks/:id', async (req, res) => {
 });
 
 // 👉 Delete task
-app.delete('/api/tasks/:id', async (req, res) => {
+app.delete('/api/taskpads/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const result = await client.query('DELETE FROM tasks WHERE task_id = $1', [id]);
+        // Delete associated tasks
+        await client.query('DELETE FROM tasks WHERE task_pad_id = $1', [id]);
+
+        // Delete the task pad itself
+        const result = await client.query('DELETE FROM task_pads WHERE task_pad_id = $1', [id]);
         if (result.rowCount === 0) {
-            return res.status(404).json({ error: 'Task not found' });
+            return res.status(404).json({ error: 'Task pad not found' });
         }
         res.status(204).end();
     } catch (err) {
-        res.status(500).json({ error: 'Error deleting task' });
+        res.status(500).json({ error: 'Error deleting task pad' });
     }
 });
+
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);

@@ -86,11 +86,10 @@ async function createNewTaskPad(userEmail, title) {
         });
 
         if (response.ok) {
-            const newTaskPad = await response.json();
+            const newTaskPad = await response.json(); // Contains task_pad_id
             const taskPadsContainer = document.getElementById("taskPadsContainer");
             const newTaskPadElement = createTaskPadElement(newTaskPad, userEmail);
             taskPadsContainer.appendChild(newTaskPadElement);
-            // No need to fetch tasks again here, the new pad is empty
         } else {
             console.error('Failed to create task pad');
         }
@@ -98,6 +97,7 @@ async function createNewTaskPad(userEmail, title) {
         console.error('Error creating task pad:', error);
     }
 }
+
 
 function createTaskPadElement(taskPadData, userEmail) {
     const taskPad = document.createElement("div");
@@ -193,6 +193,7 @@ async function fetchAndDisplayTasks(userEmail, taskPadId, taskListElement) {
     }
 }
 
+
 async function createNewTask(userEmail, taskText, taskPadId, taskListElement) {
     try {
         const response = await fetch('http://localhost:3000/api/tasks', {
@@ -214,6 +215,7 @@ async function createNewTask(userEmail, taskText, taskPadId, taskListElement) {
         console.error('Error creating task:', error);
     }
 }
+
 
 function createTaskElement(text = "", taskId, isCompleted = false, taskPadId) {
     const taskItem = document.createElement("div");
