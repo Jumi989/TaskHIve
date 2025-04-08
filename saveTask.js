@@ -1,14 +1,14 @@
-// backend/server.js (example - adjust as needed)
+// backend/server.js
 import express from 'express';
 import pkg from 'pg';
-import cors from 'cors'; // For handling Cross-Origin Requests
+import cors from 'cors';
 
 const { Client } = pkg;
 const app = express();
 const port = 3000;
 
-app.use(cors()); // Enable CORS for your frontend to connect
-app.use(express.json()); // Middleware to parse JSON request bodies
+app.use(cors());
+app.use(express.json());
 
 const client = new Client({
     host: "localhost",
@@ -18,49 +18,65 @@ const client = new Client({
     database: "taskhive",
 });
 
-async function connectDB() {
-    try {
-        await client.connect();
-        console.log("Connected to PostgreSQL (Backend)!");
-    } catch (err) {
-        console.error("Backend Database Connection Error:", err.message);
-    }
-}
+await client.connect();
+console.log("Connected to PostgreSQL!");
 
-connectDB();
-
-// API endpoint to get all tasks for a specific user
+// 👉 Get all tasks for a user
 app.get('/api/tasks/:userEmail', async (req, res) => {
     const { userEmail } = req.params;
     try {
         const result = await client.query('SELECT * FROM tasks WHERE user_email = $1', [userEmail]);
         res.json(result.rows);
-    } catch (error) {
-        console.error('Error fetching tasks:', error);
-        res.status(500).json({ error: 'Failed to fetch tasks' });
+    } catch (err) {
+        res.status(500).json({ error: 'Error fetching tasks' });
     }
 });
 
-// API endpoint to create a new task
+// 👉 Add new task
 app.post('/api/tasks', async (req, res) => {
-    const { userEmail, text } = req.body;
-    if (!userEmail || !text) {
-        return res.status(400).json({ error: 'Missing userEmail or task text' });
-    }
+    const { userEmail, title, taskText } = req.body;
     try {
         const result = await client.query(
             'INSERT INTO tasks (user_email, title, task_text) VALUES ($1, $2, $3) RETURNING *',
-            [userEmail, text, text] // Assuming title is the same as task_text for simplicity
+            [userEmail, title, taskText]
         );
-        res.status(201).json(result.rows[0]); // Send back the newly created task
-    } catch (error) {
-        console.error('Error creating task:', error);
-        res.status(500).json({ error: 'Failed to create task' });
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        res.status(500).json({ error: 'Error creating task' });
     }
 });
 
-// Implement PUT and DELETE endpoints for updating and deleting tasks as needed
+// 👉 Update task
+app.put('/api/tasks/:id', async (req, res) => {
+    const { id } = req.params;
+    const { title, taskText, is_completed } = req.body;
+
+    try {
+        const result = await client.query(
+            `UPDATE tasks SET title = $1, task_text = $2, is_completed = $3, updated_at = now()
+             WHERE task_id = $4 RETURNING *`,
+            [title, taskText, is_completed, id]
+        );
+        res.json(result.rows[0]);
+    } catch (err) {
+        res.status(500).json({ error: 'Error updating task' });
+    }
+});
+
+// 👉 Delete task
+app.delete('/api/tasks/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await client.query('DELETE FROM tasks WHERE task_id = $1', [id]);
+        res.status(204).end();
+    } catch (err) {
+        res.status(500).json({ error: 'Error deleting task' });
+    }
+});
 
 app.listen(port, () => {
-    console.log(`Backend server listening on port ${port}`);
+    console.log(`Server running on http://localhost:${port}`);
 });
+app.get('/', (req, res) => {
+    res.send('TaskHive backend is running 🎉');
+  });
