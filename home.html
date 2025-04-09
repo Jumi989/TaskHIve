@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <html lang="en"> <head> 
     <meta charset="UTF-8"/> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
@@ -32,3 +33,128 @@
                 <script type="module" src="/src/main.js"></script> 
             </body> 
             </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TaskHive</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    #scrollableTaskPads {
+    max-height: calc((4 * 100px) + 20px); /* Or your calculated max-height */
+    overflow-y: scroll; /* Force scrollbar to be present */
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none; /* For Internet Explorer and Edge */
+    margin-bottom: 80px; /* Adjust as needed */
+}
+
+/* For Chrome, Safari, and Opera */
+#scrollableTaskPads::-webkit-scrollbar {
+    display: none;
+}
+</style>
+</head>
+<body class="bg-gray-100 min-h-screen p-5 relative">
+
+  <h1 class="absolute top-5 left-5 text-3xl font-bold font-serif text-gray-800 mb-4 ">
+    <span class="text-[#63191C]">T</span>
+    <span class="text-[#A17865]">a</span>
+    <span class="text-[#EAD7C8]">s</span>
+    <span class="text-[#D2B6A1]">k</span>
+    <span class="text-[#8D3E36]">H</span>
+    <span class="text-[#A17865]">i</span>
+    <span class="text-[#EAD7C8]">v</span>
+    <span class="text-[#D2B6A1]">e</span>
+  </h1>
+
+  <div id="div" class="flex items-center space-x-4 mb-4">
+    <h2 class="text-[#8D3E36] font-serif text-lg"></h2>
+  </div>
+
+  <!-- Grid of Task Pads -->
+  <div id="scrollableTaskPads" class="max-h-[calc((4 * 100px) + 20px)] overflow-y-auto">
+    <div id="taskPadsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-[#63191C]">
+        </div>
+</div>
+
+  <!-- Floating Add Button -->
+  <button id="addTaskPad" class="fixed bottom-15 right-15 bg-[#63191C] text-white text-3xl w-16 h-16 flex items-center justify-center rounded-full shadow-lg hover:bg-[#8A2A2D]">
+    +
+  </button>
+
+  <script>
+    function createTaskElement(text = "") {
+      const taskItem = document.createElement("div");
+      taskItem.className = "flex items-center justify-between mt-2 group";
+
+      const taskText = document.createElement("div");
+      taskText.contentEditable = true;
+      taskText.innerText = text;
+      taskText.className = "flex-1 px-2 py-1 rounded hover:bg-gray-100 focus:outline-none cursor-text";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = "mr-2 cursor-pointer";
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.innerHTML = "🗑️";
+      deleteBtn.className = "text-red-500 opacity-0 group-hover:opacity-100 ml-2";
+
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          taskText.classList.add("line-through", "text-gray-400");
+        } else {
+          taskText.classList.remove("line-through", "text-gray-400");
+        }
+      });
+
+      deleteBtn.addEventListener("click", () => {
+        taskItem.remove();
+      });
+
+      taskItem.appendChild(checkbox);
+      taskItem.appendChild(taskText);
+      taskItem.appendChild(deleteBtn);
+
+      return taskItem;
+    }
+
+    document.getElementById("addTaskPad").addEventListener("click", function () {
+      const taskPadsContainer = document.getElementById("taskPadsContainer");
+
+      const taskPad = document.createElement("div");
+      taskPad.classList.add("bg-white", "p-4", "rounded-lg", "shadow-md", "relative");
+
+      taskPad.innerHTML = `
+        <input type="text" class="task-title text-lg font-semibold w-full bg-transparent focus:outline-none" placeholder="Task List Name" />
+        <div class="task-list mt-2"></div>
+        <input type="text" class="new-task-input mt-2 w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none" placeholder="Type a task and press Enter" />
+        <p class="task-date text-gray-500 text-xs mt-2">${new Date().toDateString()}</p>
+        <button class="delete-pad absolute top-2 right-2 text-red-500 text-lg">&times;</button>
+      `;
+
+      const taskList = taskPad.querySelector(".task-list");
+      const newTaskInput = taskPad.querySelector(".new-task-input");
+
+      newTaskInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter" && newTaskInput.value.trim() !== "") {
+          const taskElement = createTaskElement(newTaskInput.value.trim());
+          taskList.appendChild(taskElement);
+          newTaskInput.value = "";
+        }
+      });
+
+      // Delete task pad
+      taskPad.querySelector(".delete-pad").addEventListener("click", function () {
+        taskPad.remove();
+      });
+
+      taskPadsContainer.appendChild(taskPad);
+    });
+  </script>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
+>>>>>>> parent of ef000d4 (Old version.4)

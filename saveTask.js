@@ -2,14 +2,14 @@
 
 import express from 'express';
 import pkg from 'pg';
-import cors from 'cors';
+import cors from 'cors'; // For handling Cross-Origin Requests
 
 const { Client } = pkg;
 const app = express();
 const port = 3000;
 
-app.use(cors());
-app.use(express.json());
+app.use(cors()); // Enable CORS for your frontend to connect
+app.use(express.json()); // Middleware to parse JSON request bodies
 
 const client = new Client({
   host: "localhost",
@@ -19,10 +19,18 @@ const client = new Client({
   database: "taskhive",
 });
 
-await client.connect();
-console.log("Connected to PostgreSQL!");
+async function connectDB() {
+    try {
+        await client.connect();
+        console.log("Connected to PostgreSQL (Backend)!");
+    } catch (err) {
+        console.error("Backend Database Connection Error:", err.message);
+    }
+}
 
-// 👉 Get all task pads for a user
+connectDB();
+
+// API endpoint to get all tasks for a specific user
 app.get('/api/tasks/:userEmail', async (req, res) => {
     const { userEmail } = req.params;
     const { taskPadId } = req.query; // Optional filter by task pad
@@ -39,119 +47,32 @@ app.get('/api/tasks/:userEmail', async (req, res) => {
     try {
         const result = await client.query(query, values);
         res.json(result.rows);
-    } catch (err) {
-        res.status(500).json({ error: 'Error fetching tasks' });
+    } catch (error) {
+        console.error('Error fetching tasks:', error);
+        res.status(500).json({ error: 'Failed to fetch tasks' });
     }
 });
 
-// 👉 Add new task
-// backend/server.js
-
-// ... other imports and setup ...
-
-// 👉 Add new task
+// API endpoint to create a new task
 app.post('/api/tasks', async (req, res) => {
-    const { userEmail, taskText, taskPadId } = req.body; // Expecting these from the frontend
-    const title = taskText; // Setting the title to be the same as the task text for now
-
-    if (!taskPadId) {
-        return res.status(400).json({ error: 'taskPadId is required to create a task' });
+    const { userEmail, text } = req.body;
+    if (!userEmail || !text) {
+        return res.status(400).json({ error: 'Missing userEmail or task text' });
     }
-
     try {
-        // 1. Get the current maximum task_item_order for the given task_pad_id
-        const orderResult = await client.query(
-            'SELECT MAX(task_item_order) FROM tasks WHERE task_pad_id = $1',
-            [taskPadId]
-        );
-        const currentMaxOrder = orderResult.rows[0].max || 0;
-
-        // 2. Determine the next task_item_order
-        const nextOrder = currentMaxOrder + 1;
-
-        // 3. Insert the new task with all the required information
         const result = await client.query(
-            'INSERT INTO tasks (user_email, title, task_text, task_pad_id, task_item_order) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [userEmail, title, taskText, taskPadId, nextOrder]
+            'INSERT INTO tasks (user_email, title, task_text) VALUES ($1, $2, $3) RETURNING *',
+            [userEmail, text, text] // Assuming title is the same as task_text for simplicity
         );
-
-        // 4. Send the newly created task data back to the frontend
-        res.status(201).json(result.rows[0]);
-
-    } catch (err) {
-        console.error("Error creating task:", err);
-        res.status(500).json({ error: 'Error creating task' });
+        res.status(201).json(result.rows[0]); // Send back the newly created task
+    } catch (error) {
+        console.error('Error creating task:', error);
+        res.status(500).json({ error: 'Failed to create task' });
     }
 });
 
-// ... other routes ...
-
-// 👉 Update task
-app.put('/api/tasks/:id', async (req, res) => {
-  const { id } = req.params;
-  const { title, taskText, is_completed, taskPadId } = req.body; // Allow updating taskPadId if needed
-
-  const updates = [];
-  const values = [];
-  let paramIndex = 1;
-
-  if (title !== undefined) {
-      updates.push(`title = $${paramIndex++}`);
-      values.push(title);
-  }
-  if (taskText !== undefined) {
-      updates.push(`task_text = $${paramIndex++}`);
-      values.push(taskText);
-  }
-  if (is_completed !== undefined) {
-      updates.push(`is_completed = $${paramIndex++}`);
-      values.push(is_completed);
-  }
-  if (taskPadId !== undefined) {
-      updates.push(`task_pad_id = $${paramIndex++}`);
-      values.push(taskPadId);
-  }
-
-  updates.push(`updated_at = now()`); // Always update timestamp
-
-  if (updates.length === 0) {
-      return res.status(400).json({ error: 'No fields to update' });
-  }
-
-  values.push(id); // Final param for WHERE clause
-  const query = `UPDATE tasks SET ${updates.join(', ')} WHERE task_id = $${paramIndex} RETURNING *`;
-
-  try {
-      const result = await client.query(query, values);
-      if (result.rows.length === 0) {
-          return res.status(404).json({ error: 'Task not found' });
-      }
-      res.json(result.rows[0]);
-  } catch (err) {
-      console.error("Error updating task:", err);
-      res.status(500).json({ error: 'Error updating task' });
-  }
-});
-
-
-// 👉 Delete task
-app.delete('/api/tasks/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const result = await client.query('DELETE FROM tasks WHERE task_id = $1', [id]);
-        if (result.rowCount === 0) {
-            return res.status(404).json({ error: 'Task not found' });
-        }
-        res.status(204).end();
-    } catch (err) {
-        res.status(500).json({ error: 'Error deleting task' });
-    }
-});
+// Implement PUT and DELETE endpoints for updating and deleting tasks as needed
 
 app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
-
-app.get('/', (req, res) => {
-  res.send('TaskHive backend is running 🎉');
+    console.log(`Backend server listening on port ${port}`);
 });
