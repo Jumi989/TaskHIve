@@ -96,10 +96,11 @@ async function createNewTaskPad(userEmail, title) {
         });
 
         if (response.ok) {
-            const newTaskPad = await response.json(); // Contains task_pad_id
+            const newTaskPad = await response.json();
             const taskPadsContainer = document.getElementById("taskPadsContainer");
             const newTaskPadElement = createTaskPadElement(newTaskPad, userEmail);
             taskPadsContainer.appendChild(newTaskPadElement);
+            // No need to fetch tasks again here, the new pad is empty
         } else {
             console.error('Failed to create task pad');
         }
@@ -108,8 +109,7 @@ async function createNewTaskPad(userEmail, title) {
     }
 }
 
-  
-  function createTaskPadElement(taskPadData, userEmail) {
+function createTaskPadElement(taskPadData, userEmail) {
     const taskPad = document.createElement("div");
     taskPad.classList.add("bg-white", "p-4", "rounded-lg", "shadow-md", "relative");
     taskPad.dataset.taskPadId = taskPadData.task_pad_id;
@@ -204,8 +204,7 @@ async function createNewTaskPad(userEmail, title) {
     }
 }
 
-  
-  async function createNewTask(userEmail, taskText, taskPadId, taskListElement) {
+async function createNewTask(userEmail, taskText, taskPadId, taskListElement) {
     try {
         const response = await fetch('http://localhost:3000/api/tasks', {
             method: 'POST',
@@ -227,8 +226,7 @@ async function createNewTaskPad(userEmail, title) {
     }
 }
 
-  
-  function createTaskElement(text = "", taskId, isCompleted = false, taskPadId) {
+function createTaskElement(text = "", taskId, isCompleted = false, taskPadId) {
     const taskItem = document.createElement("div");
     taskItem.className = "flex items-center justify-between mt-2 group";
     taskItem.dataset.taskId = taskId;
