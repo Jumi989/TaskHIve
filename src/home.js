@@ -51,23 +51,16 @@ async function getLoggedInUserEmail() {
     }
 }
 
-async function fetchTasks() {
-    const userEmail = await getLoggedInUserEmail();
-    if (!userEmail) return;
-
+async function fetchTasks(userEmail) {
     try {
-        const response = await fetch(`/api/tasks/${userEmail}`);
-        if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
-
+        const response = await fetch(`http://localhost:3000/api/tasks/${userEmail}`);
         const tasks = await response.json();
-        const taskPadsContainer = document.getElementById("taskPadsContainer");
-        taskPadsContainer.innerHTML = "";
-
-        tasks.forEach(task => createTaskPad(task, taskPadsContainer, userEmail));
-    } catch (err) {
-        console.error("Error fetching tasks:", err);
+        console.log(tasks);
+    } catch (error) {
+        console.error('Failed to fetch tasks:', error);
     }
 }
+
 
 function createTaskPad(task, container, userEmail) {
     const taskPad = document.createElement("div");
